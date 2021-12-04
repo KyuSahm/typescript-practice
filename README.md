@@ -499,4 +499,160 @@ myToyCar.start();
   "price": 10000
 } 
 "myToyCar is starting"
-```  
+```
+### 함수(function)
+- 매개변수와 리턴타입을 명시한 함수 선언을 함
+```typescript
+function add(num1:number, num2:number):void {
+    console.log(num1 + num2);
+}
+
+function isAdult(age:number):boolean {
+    return age >= 20;
+}
+
+add(1, 2);
+console.log(isAdult(12));
+```
+- 함수의 인자도 Optional하게 지정 가능
+  - `Hello, ${name || "world"}`의 의미
+    - name이 null, undefined 또는 ""인 경우, "world"를 기본값으로 사용
+```typescript
+function hello(name?:string) {
+    return `Hello, ${name || "world"}`;
+}
+
+console.log(hello("KyuSahm"));
+console.log(hello());
+```
+```bash
+# 실행 결과
+"Hello, KyuSahm" 
+"Hello, world"
+```
+- 함수의 인자의 기본값 지정 가능
+```typescript
+function hello(name = 'world') {
+    return `Hello, ${name}`;
+}
+
+console.log(hello("KyuSahm"));
+console.log(hello());
+```
+```bash
+# 실행 결과
+"Hello, KyuSahm" 
+"Hello, world" 
+```
+- 선택적인 인자의 사용 예: 선택적 인자들은 맨 뒤에 위치해야 함
+```typescript
+function hello(name:string, age?:number):string {
+    if (age !== undefined) {
+        return `Hello, ${name}. You are ${age}`;
+    } else {
+        return `Hello, ${name}`;
+    }
+}
+
+console.log(hello("KyuSahm"));
+console.log(hello("Sam", 30));
+```
+```bash
+# 실행 결과
+"Hello, KyuSahm" 
+"Hello, Sam. You are 30" 
+```
+- 앞쪽의 인자를 선택적으로 사용하고 싶으면 아래와 같은 형태로는 가능
+```typescript
+function hello(age:number|undefined, name:string):string {
+    if (age !== undefined) {
+        return `Hello, ${name}. You are ${age}`;
+    } else {
+        return `Hello, ${name}`;
+    }
+}
+
+console.log(hello(undefined, "KyuSahm"));
+console.log(hello(30, "Sam"));
+```
+```bash
+# 실행 결과
+"Hello, KyuSahm" 
+"Hello, Sam. You are 30" 
+```
+- 나머지 매개 변수의 타입 작성법
+  - 매개 변수의 타입을 특정 타입의 배열로 지정해야 함
+```javascript
+function add(...nums:number[]) {
+    return nums.reduce((result, num) => result + num, 0);
+}
+
+console.log(add(1, 2, 3));
+console.log(add(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
+```
+```bash
+# 실행 결과
+6 
+55 
+```
+- ``this``와 관련된 내용
+  - bind함수를 사용하면 this는 내가 정한 object로 고정할 수 있다
+  - typescript에서는 첫번째 함수의 인자로 this object의 object type을 지정 가능
+```typescript
+interface User {
+    name:string;
+}
+
+const Sam:User = {name:'Sam'}
+
+function showName(this:User, age:number, gender: 'm'|'f') {
+    console.log(this.name, age, gender);
+}
+
+// bind 함수의 정의:
+// For a given function, create a bound function that has the same body
+// as the original function. 
+// The this object of bound function is associated with the specified object,
+// and has the specified initial parameters
+
+// this object is bound to Sam object
+const a = showName.bind(Sam);
+a(30, 'm');
+```
+```bash
+# 실행 결과
+"Sam",  30,  "m"
+```
+- 매개 변수 타입과 리턴 타입이 여러 개일 경우에 overloading 시키는 방법
+  - 함수 선언 부 위에 별도로 명시해 주면 됨
+```javascript
+interface User {
+    name:string;
+    age:number;
+}
+
+// overloading
+function join(name:string, age: number): User;
+function join(name:string, age: string): string;
+function join(name:string, age: number | string): User | string {
+    if (typeof age === "number") {
+        return {name, age};
+    } else {
+        return "Please insert age with number format";
+    }
+}
+
+const sam:User = join("Sam", 30);
+const jane:string = join("Sam", "30");
+
+console.log(sam);
+console.log(jane);
+```
+```bash
+{
+  "name": "Sam",
+  "age": 30
+} 
+"Please insert age with number format"
+```
+### 리터럴, 유니온/교차 타입
