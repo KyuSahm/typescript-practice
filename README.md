@@ -98,6 +98,8 @@ showItems([1, 2, 3]);
 ```
 ### Typescript의 기본 타입
 #### 기본 타입과 배열 그리고, Tuple
+- Tuple: 배열의 요소마다 타입이 다른 경우, 그 타입을 명시
+
 ```javascript
 // Basic types: string, number, boolean
 let car:string = 'bmw';
@@ -214,6 +216,287 @@ let b:undefined = undefined;
 var a = null;
 var b = undefined;
 ```
+### 인터페이스(Interface)
+- 아래와 같은 코드를 typescript로 작성하면 에러가 발생
+  - ``user.name, user.age``에 대한 Type이 지정되지 않았기 때문
+```typescript
+let user:object;
 
+user = {
+    name: 'xx',
+    age: 30
+}
 
+console.log(user.name, user.age);
+```
+- 해당 문제를 해결하기 위해 interface를 사용
+```typescript
+interface User {
+    name:string;
+    age:number;
+}
+let user:User = {
+    name: 'xx',
+    age: 30
+}
 
+console.log(user.name, user.age);
+```
+- 선택적인 속성을 지정하는 방법
+  - ``?``를 속성명 뒤에 붙임
+```typescript
+interface User {
+    name:string;
+    age:number;
+    gender?:string;
+}
+
+let user:User = {
+    name: 'xx',
+    age: 30
+}
+
+console.log(user.name, user.age);
+
+user.gender = 'male';
+console.log(user.name, user.age, user.gender);
+```
+- 읽기 전용(ReadOnly)를 만드는 법
+  - 최초에 생성할 때만 할당이 가능함
+```typescript
+interface User {
+    name: string;
+    age: number;
+    gender?: string;
+    readonly birthYear: number;
+}
+
+let user:User = {
+    name: 'xx',
+    age: 30,
+    birthYear: 2000
+}
+
+user.age = 10;
+user.gender = 'male';
+//user.birthYear = 1998;
+
+console.log(user.name, user.age, user.gender, user.birthYear);
+```
+- User에 1학년부터 4학년까지 성적을 입력하게 하려면?
+  - interface의 선언이 복잡해짐
+```typescript
+interface User {
+    name: string;
+    age: number;
+    gender?: string;
+    readonly birthYear: number;
+    1? : string;
+    2? : string;
+    3? : string;
+    4? : string;
+}
+
+let user:User = {
+    name: 'xx',
+    age: 30,
+    birthYear: 2000,
+    1: 'A'
+}
+
+user.age = 10;
+user.gender = 'male';
+
+console.log(user.name, user.age, user.gender, user.birthYear);
+```
+- 문자열 인덱스 서명을 사용하는 방법으로 개선
+```typescript
+interface User {
+    name: string;
+    age: number;
+    gender?: string;
+    readonly birthYear: number;
+    [grade:number]: string;
+}
+
+let user:User = {
+    name: 'xx',
+    age: 30,
+    birthYear: 2000,
+    1: 'A',
+    2: 'B'
+}
+
+user.age = 10;
+user.gender = 'male';
+
+console.log(user.name, user.age, user.gender, user.birthYear);
+console.log(user["1"], user["2"]);
+```
+- 문자열 리터럴 타입
+  - 위의 예제에서 성적의 값이 문자열로 지정되어서 범위가 너무 넓음
+  - 특정 문자열만 가능하도록 범위를 제한
+```typescript
+type Score = 'A' | 'B' | 'C' | 'F';
+
+interface User {
+    name: string;
+    age: number;
+    gender?: string;
+    readonly birthYear: number;
+    [grade:number]: Score;
+}
+
+let user:User = {
+    name: 'xx',
+    age: 30,
+    birthYear: 2000,
+    1: 'A',
+    2: 'B'
+    //3: 'D'
+}
+
+user.age = 10;
+user.gender = 'male';
+
+console.log(user.name, user.age, user.gender, user.birthYear);
+console.log(user["1"], user["2"]);
+```
+- 인터페이스로 함수를 지정하는 방법
+  - 인자의 타입과 반환 타입을 지정 가능
+```typescript
+interface Add {
+    (num1:number, num2:number):number;
+}
+
+const add:Add = function(x, y) {
+    return x + y;
+}
+
+console.log(add(10, 20));
+
+interface IsAdult {
+    (age:number):boolean   
+}
+
+// 화살표 함수 사용 가능
+const isAdult:IsAdult = age => age > 19;
+console.log(isAdult(40));
+```
+- 인터페이스로 클래스를 선언하는 방법
+  - 속성과 메소드를 지정  
+```typescript
+interface Car {
+    color:string;
+    wheels:number;
+    start():void;
+}
+
+class Bmw implements Car {
+    color;
+    wheels = 4;
+
+    constructor(color:string) {
+        this.color = color;
+    }
+
+    start() {
+        console.log('go.....');
+    }
+}
+
+const myCar = new Bmw('green');
+console.log(myCar);
+myCar.start();
+```
+```javascript
+// 아래와 같이 javascript로 변환됨
+"use strict";
+class Bmw {
+    constructor(color) {
+        this.wheels = 4;
+        this.color = color;
+    }
+    start() {
+        console.log('go.....');
+    }
+}
+const myCar = new Bmw('green');
+console.log(myCar);
+myCar.start();
+```
+```bash
+# 수행결과
+Bmw: {
+  "wheels": 4,
+  "color": "green"
+} 
+"go....."
+```
+- 인터페이스를 확장하는 방법
+  - ``extends`` 키워드를 사용
+```typescript
+interface Car {
+    color:string;
+    wheels:number;
+    start():void;
+}
+
+interface Benz extends Car {
+    door:number;
+    stop():void;
+}
+
+const myBenz:Benz = {
+    door:5,
+    stop() {
+        console.log('stopped.....');
+    },
+    color:'blue',
+    wheels:4,
+    start() {
+        console.log('start.....');
+    }
+}
+console.log(myBenz);
+myBenz.stop();
+```
+- 여러개의 인터페이스를 확장하는 방법
+  - ``extends`` 키워드를 사용
+```typescript
+interface Car {
+    color:string;
+    wheels:number;
+    start():void;
+}
+
+interface Toy {
+    name:string;
+}
+
+interface ToyCar extends Car, Toy {
+    price:number;
+}
+
+const myToyCar:ToyCar = {
+    name:'myToyCar',
+    color:'red',
+    wheels:10,
+    price:10000,
+    start() {
+        console.log('myToyCar is starting');
+    }
+}
+
+console.log(myToyCar);
+myToyCar.start();
+```
+```bash
+{
+  "name": "myToyCar",
+  "color": "red",
+  "wheels": 10,
+  "price": 10000
+} 
+"myToyCar is starting"
+```  
