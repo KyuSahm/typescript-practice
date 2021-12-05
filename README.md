@@ -656,3 +656,107 @@ console.log(jane);
 "Please insert age with number format"
 ```
 ### 리터럴, 유니온/교차 타입
+#### 리터럴 타입
+- 변수 혹은 매개변수 등이 string이나 number 처럼 어떠한 포괄적인 타입을 가지는 것이 아니라 변수나 매개변수에 정확한 값을 설정하는 것을 의미
+- string, number 혹은 boolean 타입의 값도 설정이 가능
+- 예시 1
+```typescript
+// foo 변수에 할당되는 타입은 'Hello World'만 가능
+let foo: 'Hello World!';
+// phone 변수에 할당되는 타입은 숫자 1만 가능
+let phone: 1;
+// 에러가 발생합니다.
+//foo = 'Good Morning!';
+```
+- 예시 2
+```typescript
+// typescript에서는 userName1의 type을 "Bob"라고 지정
+// const userName1:"Bob"임. 리터럴 타입임
+const userName1 = "Bob";
+// typescript에서는 userName2의 type을 "string"라고 지정
+// let userName2:string임.
+let userName2 = "Tom";
+
+// 오류 발생. number type value cannot be assigned to string type
+//userName2 = 1;
+```
+- 리터럴 타입은 일반적으로 유니온 타입(``|``)과 주로 함께 사용
+  - enum을 사용하는 것과 비슷한 효과 발생
+```typescript
+type Job = "police" | "developer" | "teacher";
+
+interface User {
+    name:string;
+    job:Job;
+}
+
+const user:User = {
+    name:"Bob",
+    job:"developer"
+}
+
+interface HighSchoolStudent {
+    name: number | string;
+    grade: 1 | 2 | 3;
+}
+
+const student:HighSchoolStudent = {
+    name: "gusami",
+    grade: 3
+}
+```
+- 식별 가능한 유니온 타입
+  - 다양한 타입을 함수내에서 조건문으로 구분이 가능한 경우
+```typescript
+interface Car {
+    name:"car";
+    color:string;
+    start():void;
+}
+
+interface Mobile {
+    name:"mobile";
+    color:string;
+    call():void;
+}
+
+function getGift(gift: Car | Mobile):void {
+    console.log(gift.color);
+    // error. property 'start' does not exist on type Mobile
+    //gift.start();   
+    if (gift.name === "car") {
+        gift.start();
+    } else {
+        gift.call();
+    }    
+}
+
+let car:Car = {
+    name: "car", 
+    color:"red",
+    start: () => console.log("start to go.....")
+}
+```
+- 교차 타입(Intersection Type)
+  - 모든 interface에서 선언된 속성을 모두 정의해 줘야 함
+```typescript
+interface Car {
+    name:string;
+    start():void;
+}
+
+interface Toy {
+    name:string;
+    color:string;
+    price:number;
+}
+
+const toyCar: Toy & Car = {
+    name:"타요",
+    start() { console.log("start...") },
+    color:"blue",
+    price:1000
+}
+
+toyCar.start();
+```
