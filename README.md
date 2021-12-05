@@ -1,4 +1,4 @@
-## Typescript
+# Typescript
 - 브라우저는 typescript를 인식 못함
   - typescript로 짠 코드를 javascript로 변환해야 함
 - [TypeScript Playground](https://www.typescriptlang.org/play)
@@ -15,7 +15,7 @@ $node index.js
 [ 'z', 1, 2 ]
 ```
 
-### Typescript를 사용하는 이유
+## Typescript를 사용하는 이유
 - 아래와 같이, javascript에서는 인자를 전달하지 않아도 에러가 발생하지 않음
   - ``NaN = undefined + undefined``
   - ``NaN = number + undefined``
@@ -96,8 +96,8 @@ function showItems(arr:number[]) {
 showItems([1, 2, 3]);
 //showItems(1, 2, 3);
 ```
-### Typescript의 기본 타입
-#### 기본 타입과 배열 그리고, Tuple
+## Typescript의 기본 타입
+### 기본 타입과 배열 그리고, Tuple
 - Tuple: 배열의 요소마다 타입이 다른 경우, 그 타입을 명시
 
 ```javascript
@@ -119,7 +119,7 @@ b[0].toLowerCase();
 //b[1].toLowerCase();
 console.log(b);
 ```
-#### 함수의 반환 타입
+### 함수의 반환 타입
 - 반환하지 않는 경우
 ```javascript
 function sayHello():void {
@@ -141,8 +141,8 @@ function infLoop():never {
     }
 }
 ```
-#### enum type
-##### 숫자를 사용한 enum type
+### enum type
+#### 숫자를 사용한 enum type
 - ``index.ts``
 ```javascript
 enum Os {
@@ -176,7 +176,7 @@ $node index.js
 Ios
 4
 ```
-##### 문자열을 사용한 enum type
+#### 문자열을 사용한 enum type
 - ``index.ts``
 ```javascript
 enum Os {
@@ -205,7 +205,7 @@ $tsc index.ts
 $node index.js
 win
 ```
-##### null, undefined type
+#### null, undefined type
 - ``index.ts``
 ```javascript
 let a:null = null;
@@ -216,7 +216,7 @@ let b:undefined = undefined;
 var a = null;
 var b = undefined;
 ```
-### 인터페이스(Interface)
+## 인터페이스(Interface)
 - 아래와 같은 코드를 typescript로 작성하면 에러가 발생
   - ``user.name, user.age``에 대한 Type이 지정되지 않았기 때문
 ```typescript
@@ -500,7 +500,7 @@ myToyCar.start();
 } 
 "myToyCar is starting"
 ```
-### 함수(function)
+## 함수(function)
 - 매개변수와 리턴타입을 명시한 함수 선언을 함
 ```typescript
 function add(num1:number, num2:number):void {
@@ -655,8 +655,8 @@ console.log(jane);
 } 
 "Please insert age with number format"
 ```
-### 리터럴, 유니온/교차 타입
-#### 리터럴 타입
+## 리터럴, 유니온/교차 타입
+### 리터럴 타입
 - 변수 혹은 매개변수 등이 string이나 number 처럼 어떠한 포괄적인 타입을 가지는 것이 아니라 변수나 매개변수에 정확한 값을 설정하는 것을 의미
 - string, number 혹은 boolean 타입의 값도 설정이 가능
 - 예시 1
@@ -760,3 +760,188 @@ const toyCar: Toy & Car = {
 
 toyCar.start();
 ```
+
+## 클래스(class)
+- 타입 스크립트에서 클래스의 필드는 먼저 선언해서 타입을 명시해 줘야 함
+```typescript
+class Car {
+    color:string;
+    constructor(color:string) {
+        this.color = color;
+    }
+
+    start() {
+        console.log("start");
+    }
+}
+
+const bmw = new Car("red");
+bmw.start();
+```
+- 클래스의 필드를 먼저 선언하지 않아도 되는 방법
+  - 생성자의 인수를 public 또는 readonly로 선언하면 됨
+```typescript
+class Car {
+    constructor(public color:string) {
+        this.color = color;
+    }
+
+    //constructor(readonly color:string) {
+    //    this.color = color;
+    //}
+
+    start() {
+        console.log("start");
+    }
+}
+
+const bmw = new Car("red");
+bmw.start();
+```
+- 클래스의 접근 제한자
+  - public: 아무데서나 접근 가능. 생략하면 기본적으로 public
+  - private: 자신의 클래스에서만 접근 가능. 필드명 앞에 ``#``을 사용 가능
+  - protected: 자신과 하위 클래스에서 접근 가능
+- 클래스의 상속
+  - 하위 클래스의 생성자에서는 반드시 상위 클래스의 생성자를 호출해야 함
+  - ``readonly``를 통해 변경을 못하게 할 수 있음. 생성자 내에서는 변경 가능
+  - 상위 클래스의 변수는 ``super``가 아닌 ``this``로 접근
+  - 상위 클래스의 메소드는 ``super``로 접근
+```javascript
+// Access modifier - public, private, protected
+class Car {
+    protected name:string = "car";
+    //readonly name:string = "car";
+    color:string;
+
+    constructor(color:string) {
+        this.color = color;
+    }
+
+    start() {
+        console.log(`${this.color} ${this.name} start...`);
+    }
+}
+
+class Bmw extends Car {
+    constructor(color:string) {
+        super(color);
+    }
+    showName() {
+        super.start();
+        console.log(this.name);
+    }
+}
+
+const bmw:Bmw = new Bmw("red");
+bmw.start();
+bmw.showName();
+```
+```typescript
+// Access modifier - public, private, protected
+class Car {
+    readonly name:string = "car";
+    color:string;
+
+    constructor(color:string, name:string) {
+        this.color = color;
+        this.name = name;
+    }
+
+    start() {
+        console.log(`${this.color} ${this.name} start...`);
+    }
+}
+
+class Bmw extends Car {
+    constructor(color:string, name:string) {
+        super(color, name);
+    }
+    showName() {
+        super.start();
+        console.log(this.name);
+    }
+}
+
+const bmw:Bmw = new Bmw("red", "BMW");
+bmw.start();
+bmw.showName();
+```
+- ``static``를 통해서 정적 필드를 만들 수 있음
+```javascript
+// Access modifier - public, private, protected
+class Car {
+    readonly name:string = "car";
+    color:string;
+    static wheels:number = 4;
+
+    constructor(color:string, name:string) {
+        this.color = color;
+        this.name = name;
+    }
+
+    start() {
+        console.log(`${this.color} ${this.name} start...`);
+    }
+}
+
+class Bmw extends Car {
+    constructor(color:string, name:string) {
+        super(color, name);
+    }
+    showName() {
+        super.start();
+        console.log(this.name);
+    }
+}
+
+const bmw:Bmw = new Bmw("red", "BMW");
+bmw.start();
+bmw.showName();
+console.log(Car.wheels)
+```
+- 추상 클래스
+ - 클래스 키워드 앞에 ``abstract`` 키워드를 붙임
+ - ``new``를 통해서 객체 생성 불가
+ - 추상 메소드가 존재하면, 상속 받은 클래스에서 받드시 구현해 줘야 함
+ ```typescript
+ // Access modifier - public, private, protected
+abstract class Car {
+    readonly name:string = "car";
+    color:string;
+    static wheels:number = 4;
+
+    constructor(color:string, name:string) {
+        this.color = color;
+        this.name = name;
+    }
+
+    start() {
+        console.log(`${this.color} ${this.name} start...`);
+    }
+    abstract doSomething():void;
+}
+
+class Bmw extends Car {
+    constructor(color:string, name:string) {
+        super(color, name);
+    }
+    showName() {
+        super.start();
+        console.log(this.name);
+    }
+
+    // should implement abstract class method
+    doSomething():void {
+        console.log("doSomething...");
+    }
+}
+
+// Error. Cannot create instance of an abstract class.
+//const car:Car = new Car("yellow", "Sonata");
+const bmw:Bmw = new Bmw("red", "BMW");
+bmw.start();
+bmw.showName();
+console.log(Car.wheels)
+bmw.doSomething();
+ ``` 
