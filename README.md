@@ -1061,3 +1061,214 @@ showName(user);
 showName(car);
 //showName(book);
 ```
+## 유틸리티 타입(Utility Types)
+- interface의 Property 값을 타입으로 정의 가능
+```typescript
+interface User {
+    id:number;
+    name:string;
+    age:number;
+    gender:"m" | "f";
+}
+
+type UserKey = keyof User; // 'id' | 'name' | 'age' | 'gender';
+
+const uk:UserKey = "age";
+console.log(uk);
+```
+- ``Partial<Type명>``을 사용하면 Type명의 모든 Property를 명시안해도 됨
+```typescript
+// Partial<T>
+interface User {
+    id:number;
+    name:string;
+    age:number;
+    gender:"m" | "f";
+}
+
+// Partial을 사용하면 아래와 동일
+//interface User {
+//    id?:number;
+//    name?:string;
+//    age?:number;
+//    gender?:"m" | "f";
+//}
+
+let admin:Partial<User> = {
+    id: 1,
+    name: "Bob"
+}
+
+console.log(admin.id, admin.name);
+```
+- ``Required<Type명>``을 사용하면 Type명의 모든 Property를 명시해야 함
+  - 아래의 선택적인 속성 ``age``가 필수적인 속성으로 바뀜
+```typescript
+interface User {
+    id:number;
+    name:string;
+    age?:number;
+}
+
+let admin:Required<User> = {
+    id: 1,
+    name: "Bob",
+    age: 32
+}
+
+console.log(admin.id, admin.name, admin.age);
+```
+- ``Required<Type명>``을 사용하면 Type명의 모든 Property를 명시해야 함
+```typescript
+interface User {
+    id:number;
+    name:string;
+    age?:number;
+}
+
+let admin:Readonly<User> = {
+    id: 1,
+    name: "Bob",
+    age: 32
+}
+
+// readonly 속성이므로 변경 불가
+//admin.id = 4;
+
+console.log(admin.id, admin.name, admin.age);
+```
+- ``Record<K, T>``
+  - K는 Key이고, T는 Type을 의미
+- ``Record<K, T>``를 사용하지 않은 경우
+```typescript
+interface Score {
+    "1": "A" | "B" | "C" | "D";
+    "2": "A" | "B" | "C" | "D";
+    "3": "A" | "B" | "C" | "D";
+    "4": "A" | "B" | "C" | "D";
+};
+
+const score:Score = {
+    1: "A",
+    2: "B",
+    3: "C",
+    4: "D",
+};
+
+console.log(score["1"]);
+```
+- ``Record<K, T>``를 사용한 경우 
+```typescript
+// Record<K, T>
+const score:Record<'1' | '2' | '3' | '4', 'A' | 'B' | 'C' | 'D'> = {
+    1: "A",
+    2: "B",
+    3: "C",
+    4: "D",
+};
+
+console.log(score["1"]);
+```
+- ``Record<K, T>``와 ``type``를 함꼐 사용한 경우 
+```typescript
+// Record<K, T>
+type Grade = '1' | '2' | '3' | '4';
+type Score = 'A' | 'B' | 'C' | 'D';
+
+const score:Record<Grade, Score> = {
+    1: "A",
+    2: "B",
+    3: "C",
+    4: "D",
+};
+
+console.log(score["1"]);
+```
+- Record를 이용한 함수의 리턴 타입
+```typescript
+// Record<K, T>
+interface User {
+    id:number;
+    name:string;
+    age:number;
+}
+
+function isValid(user:User:Record<keyof User, boolean> {
+    const result:Record<keyof User, boolean> = {
+        id: user.id > 0,
+        name: user.name !== '',
+        age: user.age > 0
+    }
+
+    return result;
+}
+
+const user:User = {
+    id: 10,
+    name: "hong gil-dong",
+    age: 100
+};
+
+console.log(isValid(user));
+```
+```bash
+{
+  "id": true,
+  "name": true,
+  "age": true
+}
+```
+- ``Pick<T, K>``를 이용해서 타입에서 특정 속성만 골라서 정의
+```typescript
+// Pick<T, K>
+interface User {
+    id:number;
+    name:string;
+    age:number;
+    gender:"M" | "W";
+}
+
+// User의 속성에서 "id"와 "name"만 골라서 정의 
+const admin:Pick<User, "id" | "name"> = {
+    id: 0,
+    name: "Bob"
+}
+
+console.log(admin);
+```
+- ``Omit<T, K>``를 이용해서 타입에서 특정 속성을 빠뜨려서 정의 가능하게 함
+```typescript
+// Omit<T, K>
+interface User {
+    id:number;
+    name:string;
+    age:number;
+    gender:"M" | "W";
+}
+
+// User의 속성에서 "age"와 "gender"를 제외 가능 
+const admin:Omit<User, "age" | "gender"> = {
+    id: 0,
+    name: "Bob"
+}
+
+console.log(admin);
+```
+- ``Exclude<T1, T2>``: T1 타입에서 T2 타입과 겹치는 속성을 제외
+```typescript
+// Exclude<T1, T2>
+type T1 = string | number | boolean;
+type T2 = Exclude<T1, number | boolean>; // same with "type T2 = string;"
+
+const a:T2 = "abcde";
+console.log(a);
+```
+- ``NonNullable<Type>``: Null과 undefined 타입을 제외 시킴
+```typescript
+// NonNullable<Type>
+type T1 = string | null | undefined | void;
+type T2 = NonNullable<T1>; // same with "type T2 = string | void;"
+
+let a:T2 = "abcde";
+console.log(a);
+```
