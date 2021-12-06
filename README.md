@@ -631,7 +631,7 @@ interface User {
     age:number;
 }
 
-// overloading
+// function overloading
 function join(name:string, age: number): User;
 function join(name:string, age: string): string;
 function join(name:string, age: number | string): User | string {
@@ -800,7 +800,7 @@ bmw.start();
 ```
 - 클래스의 접근 제한자
   - public: 아무데서나 접근 가능. 생략하면 기본적으로 public
-  - private: 자신의 클래스에서만 접근 가능. 필드명 앞에 ``#``을 사용 가능
+  - private: 자신의 클래스에서만 접근 가능. 필드명 앞에 ``#``을 사용해도 동일(ES6 문법)
   - protected: 자신과 하위 클래스에서 접근 가능
 - 클래스의 상속
   - 하위 클래스의 생성자에서는 반드시 상위 클래스의 생성자를 호출해야 함
@@ -944,4 +944,120 @@ bmw.start();
 bmw.showName();
 console.log(Car.wheels)
 bmw.doSomething();
- ``` 
+ ```
+## 제너릭 (Generics)
+- 클래스, 함수, 인터페이스를 다양한 타입으로 사용 가능
+- 유니온 타입을 사용해서 여러 타입에 대한 함수를 만들 수 있음
+  - 하지만, 가독성이 좋지 않음
+```typescript
+function getSize(arr:number[] | string[] | boolean[] | object[]):number {
+    return arr.length;
+}
+
+const arr1 = [1, 2, 3];
+console.log(getSize(arr1));
+
+const arr2 = ["a", "b", "c", "d"];
+console.log(getSize(arr2));
+
+const arr3 = [false, true, true];
+console.log(getSize(arr3));
+
+const arr4 = [{}, {}, {name: "Tim"}];
+console.log(getSize(arr4));
+```
+- 제너릭을 이용해서 가독성이 높은 코드를 작성 가능
+- 함수에 사용 가능
+```typescript
+// 함수에 사용한 예
+function getSize<T>(arr:T[]):number {
+    return arr.length;
+}
+
+const arr1 = [1, 2, 3, 4, 5];
+console.log(getSize<number>(arr1));
+// 생략 가능. 매개 변수의 타입을 보고 판단
+console.log(getSize(arr1));
+
+const arr2 = ["a", "b", "c", "d"];
+console.log(getSize<string>(arr2));
+// 생략 가능. 매개 변수의 타입을 보고 판단
+console.log(getSize(arr2));
+
+const arr3 = [false, true, true];
+console.log(getSize<boolean>(arr3));
+// 생략 가능. 매개 변수의 타입을 보고 판단
+console.log(getSize(arr3));
+
+const arr4 = [{}, {}, {name: "Tim"}];
+console.log(getSize<object>(arr4));
+// 생략 가능. 매개 변수의 타입을 보고 판단
+console.log(getSize(arr4));
+```
+- Interface에 사용 가능
+```typescript
+// interface에 사용한 예
+interface Mobile<T> {
+    name:string;
+    price:number;
+    option:T;
+}
+
+const m1: Mobile<object> = {
+    name: "s21",
+    price: 1000,
+    option: {
+        color: "red", 
+        coupon: false
+    }
+};
+
+console.log(m1.name, m1.price, m1.option);
+
+const m2: Mobile<{color:string; coupon:boolean;}> = {
+    name: "s21",
+    price: 1000,
+    option: {
+        color: "red", 
+        coupon: false
+    }
+};
+console.log(m2.name, m2.price, m2.option.color, m2.option.coupon);
+
+const m3: Mobile<string> = {
+    name: "s20",
+    price: 900,
+    option: "good"
+};
+console.log(m3.name, m3.price, m3.option);
+```
+- ``extends`` 키워드를 통해 제너릭 타입을 한정할 수 있음
+  - Interface에 사용 가능
+```typescript
+interface User {
+    name:string;
+    age:number;
+}
+
+interface Car {
+    name:string;
+    color:string;
+}
+
+interface Book {
+    price:number;
+}
+
+const user:User = {name: "a", age: 10};
+const car:Car = {name: "bmw", color: "red"};
+const book:Book = {price: 3000};
+
+// T 타입이 { name:string } 인터페이스를 상속하는 타입
+function showName<T extends { name:string }>(data:T):string {
+    return data.name;
+}
+
+showName(user);
+showName(car);
+//showName(book);
+```
