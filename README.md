@@ -1118,7 +1118,7 @@ let admin:Required<User> = {
 
 console.log(admin.id, admin.name, admin.age);
 ```
-- ``Required<Type명>``을 사용하면 Type명의 모든 Property를 명시해야 함
+- ``Readonly<Type명>``을 사용하면 모든 Property가 읽기 전용
 ```typescript
 interface User {
     id:number;
@@ -1193,7 +1193,7 @@ interface User {
     age:number;
 }
 
-function isValid(user:User:Record<keyof User, boolean> {
+function isValid(user:User):Record<keyof User, boolean> {
     const result:Record<keyof User, boolean> = {
         id: user.id > 0,
         name: user.name !== '',
@@ -1212,6 +1212,7 @@ const user:User = {
 console.log(isValid(user));
 ```
 ```bash
+수행결과:
 {
   "id": true,
   "name": true,
